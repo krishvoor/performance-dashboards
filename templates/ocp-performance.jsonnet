@@ -184,6 +184,44 @@ local stackroxMem = genericGraphLegendPanel('Top 25 stackrox container RSS bytes
   )
 );
 
+// Dynatrace
+local dynaoneagentMem = genericGraphLegendPanel('OneAgent Memory Usage', 'bytes').addTarget(
+  prometheus.target(
+    'container_memory_rss{namespace="dynatrace",pod=~"hs-mc-0vfs0e6gg-67fn6-oneagent-(dkhpd|8rm2b|42t4p)",container!=""} by (pod)' ,
+    legendFormat='{{pod}}',
+  )
+);
+
+local dynaoneagentCPU = genericGraphLegendPanel('OneAgent CPU Usage', 'percent').addTarget(
+  prometheus.target(
+    'irate(container_cpu_usage_seconds_total{namespace="dynatrace", pod=~"hs-mc-0vfs0e6gg-67fn6-oneagent-(dkhpd|8rm2b|42t4p)",container!~"POD|"}[$interval])*100',
+    legendFormat='{{container}}-{{pod}}-{{node}}',
+  )
+);
+
+local dynaactivegateMem = genericGraphLegendPanel('Active Gate Memory Usage', 'bytes').addTarget(
+  prometheus.target(
+    'container_memory_rss{namespace="dynatrace",pod=~"hs-mc-0vfs0e6gg-67fn6-oneagent-activegate-(0|1)",container!=""} by (pod)' ,
+    legendFormat='{{pod}}',
+  )
+);
+
+local dynaactivegateCPU = genericGraphLegendPanel('Active Gate CPU Usage', 'percent').addTarget(
+  prometheus.target(
+    'irate(container_cpu_usage_seconds_total{namespace="dynatrace", pod=~"hs-mc-0vfs0e6gg-67fn6-activegate-(0|1)",container!~"POD|"}[$interval])*100',
+    legendFormat='{{container}}-{{pod}}-{{node}}',
+  )
+);
+
+//
+// PlaceHolder for OpenTelemetry Mem & CPU Usuage
+// PlaceHolder for Storage/Network
+//      * OneAgent
+//      * Active Gate
+//      * OpenTelemetry
+//
+
+
 // OVN
 local ovnAnnotationLatency = genericGraphPanel('99% Pod Annotation Latency', 's').addTarget(
   prometheus.target(
@@ -491,7 +529,7 @@ grafana.dashboard.new(
   grafana.template.new(
     '_worker_node',
     '$datasource',
-    'label_values(kube_node_role{role=~"work.*"}, node)',
+    'label_values(kube_node_role{role=~"work.*", role!~"infra.*"}, node)',
     '',
     refresh=2,
   ) {
@@ -654,6 +692,15 @@ grafana.dashboard.new(
     clusterOperatorsDegraded { gridPos: { x: 8, y: 4, w: 8, h: 8 } },
   ],
 ), { gridPos: { x: 0, y: 4, w: 24, h: 1 } })
+
+.addPanel(grafana.row.new(title='Dynatrace Details', collapse=true).addPanels(
+  [
+    dynaoneagentCPU { gridPos: { x: 0, y: 4, w: 24, h: 3 } },
+    dynaoneagentMem { gridPos: { x: 0, y: 4, w: 24, h: 3 } },
+    dynaactivegateCPU { gridPos: { x: 0, y: 4, w: 24, h: 3 } },
+    dynaactivegateMem { gridPos: { x: 0, y: 4, w: 24, h: 3 } },
+  ],
+), {gridPos: {x: 0, y: 5, w: 24, h: 1 } })
 
 .addPanel(grafana.row.new(title='Master: $_master_node', collapse=true, repeat='_master_node').addPanels(
   [
