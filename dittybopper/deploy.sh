@@ -41,7 +41,7 @@ END
 export PROMETHEUS_USER=internal
 export GRAFANA_ADMIN_PASSWORD=admin
 export DASHBOARDS="ocp-performance.json api-performance-overview.json etcd-on-cluster-dashboard.json hypershift-performance.json ovn-dashboard.json"
-export SYNCER_IMAGE=${SYNCER_IMAGE:-"quay.io/cloud-bulldozer/dittybopper-syncer:latest"} # Syncer image
+export SYNCER_IMAGE=${SYNCER_IMAGE:-"quay.io/krvoora_ocm/dittybopper-syncer:latest"} # Syncer image
 export GRAFANA_IMAGE=${GRAFANA_IMAGE:-"quay.io/cloud-bulldozer/grafana:9.4.3"} # Syncer image
 
 # Set defaults for command options
