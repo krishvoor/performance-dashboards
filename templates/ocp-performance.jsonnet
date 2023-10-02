@@ -227,6 +227,13 @@ local opentelemetryMem = genericGraphLegendPanel('Opentelemetry Memory Usage', '
   )
 );
 
+local dynatraceNetwork = genericGraphLegendPanel('Network Usage in Dynatrace', 'bps').addTarget(
+  prometheus.target(
+    'rate(container_network_receive_bytes_total{namespace="dynatrace"}[$interval])' ,
+    legendFormat='{{ node}} : {{ namespace }} : {{ pod }}'
+  )
+);
+
 //
 // PlaceHolder for Storage/Network
 //      * OneAgent
@@ -714,6 +721,7 @@ grafana.dashboard.new(
     dynaactivegateMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
     opentelemetryCPU { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
     opentelemetryMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
+    dynatraceNetwork { gridPos: { x: 0, y: 4, w: 24, h: 10} },
   ],
 ), {gridPos: {x: 0, y: 5, w: 24, h: 1 } })
 
