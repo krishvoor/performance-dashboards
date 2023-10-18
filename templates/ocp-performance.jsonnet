@@ -188,7 +188,7 @@ local stackroxMem = genericGraphLegendPanel('Top 25 stackrox container RSS bytes
 local dynaoneagentMem = genericGraphLegendPanel('OneAgent Memory Usage', 'bytes').addTarget(
   prometheus.target(
     'container_memory_rss{namespace="dynatrace",pod=~".*-oneagent-.*",container!=""}' ,
-    legendFormat='{{ node }} : {{ namespace }} : {{ pod }}',
+    legendFormat='{{ pod }}',
   )
 );
 
@@ -227,19 +227,19 @@ local opentelemetryMem = genericGraphLegendPanel('Opentelemetry Memory Usage', '
   )
 );
 
-local dynatraceNetwork = genericGraphLegendPanel('Network Usage in Dynatrace', 'bps').addTarget(
+local dynatraceNetwork_TX = genericGraphLegendPanel('Network Usage TX in Dynatrace', 'Bps').addTarget(
   prometheus.target(
-    'rate(container_network_receive_bytes_total{namespace="dynatrace"}[$interval])' ,
-    legendFormat='{{ node}} : {{ namespace }} : {{ pod }}'
+    'sum(irate(container_network_transmit_bytes_total{cluster="", namespace="dynatrace"}[$interval])) by (pod)',
+    legendFormat='{{ pod }}',
   )
 );
 
-//
-// PlaceHolder for Storage/Network
-//      * OneAgent
-//      * Active Gate
-//      * OpenTelemetry
-//
+local dynatraceNetwork_RX = genericGraphLegendPanel('Network Usuage RX in Dynatrace', 'Bps').addTarget(
+  prometheus.target(
+    'sum(irate(container_network_receive_bytes_total{cluster="", namespace="dynatrace"}[$interval])) by (pod)',
+    legendFormat='{{ pod }}',
+  )
+);
 
 
 // OVN
@@ -721,7 +721,8 @@ grafana.dashboard.new(
     dynaactivegateMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
     opentelemetryCPU { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
     opentelemetryMem { gridPos: { x: 0, y: 4, w: 24, h: 10 } },
-    dynatraceNetwork { gridPos: { x: 0, y: 4, w: 24, h: 10} },
+    dynatraceNetwork_RX { gridPos: { x: 0, y: 4, w: 12, h: 10} },
+    dynatraceNetwork_TX { gridPos: { x: 12, y: 4, w: 12, h: 10} },
   ],
 ), {gridPos: {x: 0, y: 5, w: 24, h: 1 } })
 
